@@ -4,23 +4,34 @@
 {
     //Required. Inputs the module expects.
     "inputs": [
-        //e.g.
-        /*
         {
-            "id": "from",
-            "title":"From"
+            "id": "folder_id",
+            "title":"Folder ID"
+        },
+        {
+            "id": "limit",
+            "title":"Limit"
         }
-        */
     ],
     //Required. Outputs the module emits.
     "outputs": [
-      //e.g.
-      /*
         {
-            "id": "from",
-            "title":"From"
+            "id": "user",
+            "title":"User"
+        },
+        {
+            "id": "bookmarks",
+            "title":"Bookmark"
+        },
+        {
+            "id": "highlights",
+            "title":"Highlights"
+        },
+        {
+            "id": "delete_ids",
+            "title":"Delete Ids"
         }
-      */
     ],
+    "icon": "dex-instapaper",
     "title": "Instapaper List Bookmarks" /* Required.A display name for the module */
 }
