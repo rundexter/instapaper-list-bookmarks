@@ -60,7 +60,7 @@ module.exports = {
             connections = [];
 console.log(inputs);
         client.setUserCredentials(auth.user, auth.pass);
-        connections = _.map(inputs.folder_id, function(folder_id) {
+        // connections = _.map(inputs.folder_id, function(folder_id) {
             // var deferred = q.defer();
             client.bookmarks.list(_.merge({folder_id: '2818120'}, _.pick(inputs, 'limit'))).then(function(bookmarks) {
                 console.log(typeof bookmarks);
@@ -74,7 +74,7 @@ console.log(inputs);
             }.bind(this));
 
             // return deferred.promise;
-        }.bind(this));
+        // }.bind(this));
 
         // q.all(connections).then(function(results) {
         //     // merge objects and return result.
