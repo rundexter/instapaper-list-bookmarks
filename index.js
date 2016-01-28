@@ -58,37 +58,30 @@ module.exports = {
             client = Instapaper(auth.consumerKey, auth.consumerSecret, {apiUrl: apiUrl}),
             inputs = util.pickStringInputs(step, inputPickData),
             connections = [];
-console.log(inputs);
+
         client.setUserCredentials(auth.user, auth.pass);
-        // connections = _.map(inputs.folder_id, function(folder_id) {
-            // var deferred = q.defer();
-            client.bookmarks.list(_.merge({folder_id: '2818120'}, _.pick(inputs, 'limit'))).then(function(bookmarks) {
-                console.log(typeof bookmarks);
+        connections = _.map(inputs.folder_id, function(folder_id) {
+            var deferred = q.defer();
+            client.bookmarks.list(_.merge({folder_id: folder_id}, _.pick(inputs, 'limit'))).then(function(bookmarks) {
                 bookmarks = (typeof bookmarks === 'string')? JSON.parse(bookmarks) : bookmarks; 
-                // console.log(_.keys(bookmarks));
-                console.log(bookmarks.user);
-                this.complete(util.pickResult(bookmarks, outputsPickResult));
-                // deferred.resolve(util.pickResult(bookmarks, outputsPickResult));
+                deferred.resolve(util.pickResult(bookmarks, outputsPickResult));
             }.bind(this)).catch(function(err) {
-                this.fail(err);
-                // deferred.reject(err);
+                deferred.reject(err);
             }.bind(this));
 
-            // return deferred.promise;
-        // }.bind(this));
+            return deferred.promise;
+        });
 
-        // q.all(connections).then(function(results) {
-        //     // merge objects and return result.
-        //     var res = results.reduce(function(result, currentObject) {
-        //         for(var key in currentObject) {
-        //             if (currentObject.hasOwnProperty(key)) 
-        //                 result[key] = (_.isArray(currentObject[key]) && _.isArray(result[key]))?
-        //                     result[key].concat(currentObject[key]) : currentObject[key];
-        //         }
-        //         return result;
-        //     }, {});
-        //     console.log(res);
-        //     this.complete(res);
-        // }.bind(this)).fail(this.fail.bind(this));
+        q.all(connections).then(function(results) {
+            // merge objects and return result.
+            this.complete(results.reduce(function(result, currentObject) {
+                for(var key in currentObject) {
+                    if (currentObject.hasOwnProperty(key)) 
+                        result[key] = (_.isArray(currentObject[key]) && _.isArray(result[key]))?
+                            result[key].concat(currentObject[key]) : currentObject[key];
+                }
+                return result;
+            }, {}));
+        }.bind(this)).fail(this.fail.bind(this));
     }
 };
