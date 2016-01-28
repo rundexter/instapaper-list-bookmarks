@@ -73,14 +73,16 @@ console.log(inputs);
 
         q.all(connections).then(function(results) {
             // merge objects and return result.
-            this.complete(results.reduce(function(result, currentObject) {
+            var res = results.reduce(function(result, currentObject) {
                 for(var key in currentObject) {
                     if (currentObject.hasOwnProperty(key)) 
                         result[key] = (_.isArray(currentObject[key]) && _.isArray(result[key]))?
                             result[key].concat(currentObject[key]) : currentObject[key];
                 }
                 return result;
-            }, {}));
+            }, {});
+            console.log(res);
+            this.complete(res);
         }.bind(this)).fail(this.fail.bind(this));
     }
 };
