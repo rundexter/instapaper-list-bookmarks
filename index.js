@@ -61,28 +61,30 @@ module.exports = {
 console.log(inputs);
         client.setUserCredentials(auth.user, auth.pass);
         connections = _.map(inputs.folder_id, function(folder_id) {
-            var deferred = q.defer();
-            client.bookmarks.list(_.merge({folder_id: folder_id}, _.pick(inputs, 'limit'))).then(function(bookmarks) {
-                deferred.resolve(util.pickResult(bookmarks, outputsPickResult));
+            // var deferred = q.defer();
+            client.bookmarks.list(_.merge({folder_id: '2818120'}, _.pick(inputs, 'limit'))).then(function(bookmarks) {
+                this.complete(util.pickResult(bookmarks, outputsPickResult));
+                // deferred.resolve(util.pickResult(bookmarks, outputsPickResult));
             }.bind(this)).catch(function(err) {
-                deferred.reject(err);
+                this.fail(err);
+                // deferred.reject(err);
             }.bind(this));
 
-            return deferred.promise;
+            // return deferred.promise;
         });
 
-        q.all(connections).then(function(results) {
-            // merge objects and return result.
-            var res = results.reduce(function(result, currentObject) {
-                for(var key in currentObject) {
-                    if (currentObject.hasOwnProperty(key)) 
-                        result[key] = (_.isArray(currentObject[key]) && _.isArray(result[key]))?
-                            result[key].concat(currentObject[key]) : currentObject[key];
-                }
-                return result;
-            }, {});
-            console.log(res);
-            this.complete(res);
-        }.bind(this)).fail(this.fail.bind(this));
+        // q.all(connections).then(function(results) {
+        //     // merge objects and return result.
+        //     var res = results.reduce(function(result, currentObject) {
+        //         for(var key in currentObject) {
+        //             if (currentObject.hasOwnProperty(key)) 
+        //                 result[key] = (_.isArray(currentObject[key]) && _.isArray(result[key]))?
+        //                     result[key].concat(currentObject[key]) : currentObject[key];
+        //         }
+        //         return result;
+        //     }, {});
+        //     console.log(res);
+        //     this.complete(res);
+        // }.bind(this)).fail(this.fail.bind(this));
     }
 };
