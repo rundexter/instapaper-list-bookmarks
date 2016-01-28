@@ -1,5 +1,6 @@
 var Instapaper = require('instapaper'),
     _ = require('lodash'),
+    q = require('q'),
     util = require('./util.js');
 
 var apiUrl = 'https://www.instapaper.com/api/1.1';
@@ -13,7 +14,7 @@ var outputsPickResult = {
 
 var inputPickData = {
     'limit': 'limit',
-    'folder_id': 'folder_id'
+    'folder_id': { key: 'folder_id', type: 'array' }
 };
 
 module.exports = {
@@ -54,16 +55,32 @@ module.exports = {
     run: function(step, dexter) {
 
         var auth = this.authModule(dexter),
-            client = Instapaper(auth.consumerKey, auth.consumerSecret, {apiUrl: apiUrl});
+            client = Instapaper(auth.consumerKey, auth.consumerSecret, {apiUrl: apiUrl}),
+            inputs = util.pickStringInputs(step, inputPickData),
+            connections = [];
 
         client.setUserCredentials(auth.user, auth.pass);
+        connections = _.map(inputs.folder_id, function(folder_id) {
+            var deferred = q.defer();
+            client.bookmarks.list(_.merge({folder_id: folder_id}, _.pick(inputs, 'limit'))).then(function(bookmarks) {
+                deferred.resolve(util.pickResult(bookmarks, outputsPickResult));
+            }.bind(this)).catch(function(err) {
+                deferred.reject(err);
+            }.bind(this));
 
-        client.bookmarks.list(util.pickStringInputs(step, inputPickData)).then(function(bookmarks) {
+            return deferred.promise;
+        });
 
-            this.complete(util.pickResult(bookmarks, outputsPickResult));
-        }.bind(this)).catch(function(err) {
-
-            this.fail(err);
-        }.bind(this));
+        q.all(connections).then(function(results) {
+            // merge objects and return result.
+            this.complete(results.reduce(function(result, currentObject) {
+                for(var key in currentObject) {
+                    if (currentObject.hasOwnProperty(key)) 
+                        result[key] = (_.isArray(currentObject[key]) && _.isArray(result[key]))?
+                            result[key].concat(currentObject[key]) : currentObject[key];
+                }
+                return result;
+            }, {}));
+        }.bind(this)).fail(this.fail.bind(this));
     }
 };
