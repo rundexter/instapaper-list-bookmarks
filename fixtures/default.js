@@ -62,8 +62,8 @@ module.exports = _.merge({
              * You should update this section with some test input for testing your module
              */
             input: {
-                folder_id: ['2818120', '2818626'],
-                limit: '10'
+                folder_id: [ 2818120, 2818626 ],
+                // limit: '10'
             }
         }
     }
