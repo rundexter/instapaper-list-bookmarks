@@ -64,7 +64,7 @@ console.log(inputs);
             // var deferred = q.defer();
             client.bookmarks.list(_.merge({folder_id: '2818120'}, _.pick(inputs, 'limit'))).then(function(bookmarks) {
                 console.log(typeof bookmarks);
-                console.log(_.keys(bookmarks));
+                // console.log(_.keys(bookmarks));
                 console.log(bookmarks.user);
                 this.complete(util.pickResult(bookmarks, outputsPickResult));
                 // deferred.resolve(util.pickResult(bookmarks, outputsPickResult));
