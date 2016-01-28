@@ -71,7 +71,7 @@ console.log(inputs);
             }.bind(this));
 
             // return deferred.promise;
-        });
+        }.bind(this));
 
         // q.all(connections).then(function(results) {
         //     // merge objects and return result.
