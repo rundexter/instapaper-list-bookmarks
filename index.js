@@ -58,7 +58,7 @@ module.exports = {
             client = Instapaper(auth.consumerKey, auth.consumerSecret, {apiUrl: apiUrl}),
             inputs = util.pickStringInputs(step, inputPickData),
             connections = [];
-console.log(step.inputs());
+
         client.setUserCredentials(auth.user, auth.pass);
         connections = _.map(inputs.folder_id, function(folder_id) {
             var deferred = q.defer();
