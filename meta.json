@@ -3,35 +3,24 @@
  */
 {
     //Required. Inputs the module expects.
-    "inputs": [
-        {
-            "id": "folder_id",
-            "title":"Folder ID"
-        },
-        {
-            "id": "limit",
-            "title":"Limit"
-        }
-    ],
+    "inputs": [{
+        "id": "folder_id",
+        "title":"Folder ID"
+    }, {
+        "id": "limit",
+        "title":"Limit"
+    }],
     //Required. Outputs the module emits.
-    "outputs": [
-        {
-            "id": "user",
-            "title":"User"
-        },
-        {
-            "id": "bookmarks",
-            "title":"Bookmark"
-        },
-        {
-            "id": "highlights",
-            "title":"Highlights"
-        },
-        {
-            "id": "delete_ids",
-            "title":"Delete Ids"
-        }
-    ],
+    "outputs": [{
+        "id"    : "id",
+        "title" : "ID"
+    }, {
+        "id"    : "url",
+        "title" : "URL"
+    }, {
+        "id"    : "time",
+        "title" : "Timestamp"
+    }],
     "icon": "dex-instapaper",
     "title": "Instapaper List Bookmarks" /* Required.A display name for the module */
 }

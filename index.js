@@ -1,51 +1,27 @@
-var Instapaper = require('instapaper'),
-    _ = require('lodash'),
-    q = require('q'),
-    util = require('./util.js');
+var Instapaper = require('instapaper')
+  , _          = require('lodash')
+  , q          = require('q')
+  , util       = require('./util.js')
+;
 
 var apiUrl = 'https://www.instapaper.com/api/1.1';
 
 var outputsPickResult = {
-    'user': 'user',
-    'bookmarks': 'bookmarks',
-    'highlights': 'highlights',
-    'delete_ids': 'delete_ids'
+    user       : 'user',
+    bookmarks  : 'bookmarks',
+    highlights : 'highlights',
+    delete_ids : 'delete_ids'
 };
 
 var inputPickData = {
-    'limit': 'limit',
-    'folder_id': { key: 'folder_id', type: 'array' }
+    limit     : 'limit',
+    folder_id : {
+       key    : 'folder_id'
+       , type : 'array'
+    }
 };
 
 module.exports = {
-
-    /**
-     * Authorize module.
-     *
-     * @param dexter
-     * @returns {*}
-     */
-    authModule: function (dexter) {
-        var auth = {},
-            consumerKey = dexter.environment('instapaper_consumer_key'),
-            consumerSecret = dexter.environment('instapaper_consumer_secret'),
-
-            username = dexter.environment('instapaper_username'),
-            password = dexter.environment('instapaper_password');
-
-        if (consumerKey && consumerSecret && username && password) {
-
-            auth.consumerKey = consumerKey;
-            auth.consumerSecret = consumerSecret;
-            auth.user = username;
-            auth.pass = password;
-        } else {
-
-            this.fail('A [instapaper_consumer_key, instapaper_consumer_secret, instapaper_username, instapaper_password] environment need for this module.');
-        }
-
-        return _.isEmpty(auth)? false : auth;
-    },
     /**
      * The main entry point for the Dexter module
      *
@@ -53,35 +29,45 @@ module.exports = {
      * @param {AppData} dexter Container for all data used in this workflow.
      */
     run: function(step, dexter) {
+        var auth        = dexter.provider('instapaper').credentials() 
+          , client      = Instapaper(auth.consumer_key, auth.consumer_secret, {apiUrl: apiUrl})
+          , folder_ids  = step.input('folder_id')
+          , limit       = step.input('limit').first()
+          , self        = this
+          , connections = []
+          , bookmarks   = []
+        ;
 
-        var auth = this.authModule(dexter),
-            client = Instapaper(auth.consumerKey, auth.consumerSecret, {apiUrl: apiUrl}),
-            inputs = util.pickStringInputs(step, inputPickData),
-            connections = [];
+        //hack to search the root folder when no id is supplied
+        if(!folder_ids || !folder_ids.length) folder_ids = [null];
 
-        client.setUserCredentials(auth.user, auth.pass);
-        connections = _.map(inputs.folder_id, function(folder_id) {
+        client.setOAuthCredentials(auth.access_token, auth.access_token_secret);
+
+        _.each(folder_ids,function(folder_id) {
             var deferred = q.defer();
-            client.bookmarks.list(_.merge({folder_id: folder_id}, _.pick(inputs, 'limit'))).then(function(bookmarks) {
-                bookmarks = (typeof bookmarks === 'string')? JSON.parse(bookmarks) : bookmarks; 
-                deferred.resolve(util.pickResult(bookmarks, outputsPickResult));
-            }.bind(this)).catch(function(err) {
-                deferred.reject(err);
-            }.bind(this));
+            client.bookmarks.list({folder_id: folder_id, limit: limit || 25})
+               .then(function(result) {
+                   result = JSON.parse(result);
+                   var _bookmarks = _.map(result.bookmarks, function(bookmark) {
+                   console.log(bookmark);
+                        return {
+                            id     : bookmark.bookmark_id
+                            , url  : bookmark.url
+                            , time : bookmark.time
+                        };
+                   });
 
-            return deferred.promise;
+                   Array.prototype.splice.apply(bookmarks, [bookmarks.length, 0].concat(_bookmarks)); 
+                   deferred.resolve();
+               }).catch(function(err) {
+                   deferred.reject(err);
+               });
+
+            connections.push(deferred.promise);
         });
 
-        q.all(connections).then(function(results) {
-            // merge objects and return result.
-            this.complete(results.reduce(function(result, currentObject) {
-                for(var key in currentObject) {
-                    if (currentObject.hasOwnProperty(key)) 
-                        result[key] = (_.isArray(currentObject[key]) && _.isArray(result[key]))?
-                            result[key].concat(currentObject[key]) : currentObject[key];
-                }
-                return result;
-            }, {}));
-        }.bind(this)).fail(this.fail.bind(this));
+        q.all(connections)
+           .then(this.complete.bind(this, bookmarks))
+           .fail(this.fail.bind(this));
     }
 };

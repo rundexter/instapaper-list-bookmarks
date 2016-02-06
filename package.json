@@ -1,14 +1,18 @@
 {
-  "name": "instapaper-list-bookmarks",
-  "version": "0.0.1",
-  "description": "",
-  "main": "index.js",
-  "author": "Alexander",
-  "license": "ISC",
-  "private": true,
+  "name"        : "instapaper-list-bookmarks",
+  "version"     : "0.0.1",
+  "description" : "Get a list of bookmarks belonging to the user",
+  "main"        : "index.js",
+  "author"      : "Run Dexter, Inc",
+  "license"     : "MIT",
+  "private"     : true,
+  "repository"  : {
+    "type" : "git",
+    "url"  : "https : //github.com/rundexter/instapaper-list-bookmarks"
+  },
   "dependencies": {
-    "instapaper": "^1.0.0",
-    "lodash": "^3.9.3",
-    "q": "^1.4.1"
+    "instapaper" : "^1.0.0",
+    "lodash"     : "^3.9.3",
+    "q"          : "^1.4.1"
   }
 }
