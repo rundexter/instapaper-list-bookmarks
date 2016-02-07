@@ -49,7 +49,6 @@ module.exports = {
                .then(function(result) {
                    result = JSON.parse(result);
                    var _bookmarks = _.map(result.bookmarks, function(bookmark) {
-                   console.log(bookmark);
                         return {
                             id     : bookmark.bookmark_id
                             , url  : bookmark.url
