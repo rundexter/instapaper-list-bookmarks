@@ -2,7 +2,6 @@
  * Metadata describing the module operation
  */
 {
-    //Required. Inputs the module expects.
     "inputs": [{
         "id": "folder_id",
         "title":"Folder ID"
@@ -10,7 +9,6 @@
         "id": "limit",
         "title":"Limit"
     }],
-    //Required. Outputs the module emits.
     "outputs": [{
         "id"    : "id",
         "title" : "ID"
@@ -22,5 +20,8 @@
         "title" : "Timestamp"
     }],
     "icon": "dex-instapaper",
-    "title": "Instapaper List Bookmarks" /* Required.A display name for the module */
+    "title": "Instapaper List Bookmarks",
+    "providers": [ {
+        "name": "instapaper"
+    } ]
 }
