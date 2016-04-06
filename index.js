@@ -29,7 +29,7 @@ module.exports = {
      * @param {AppData} dexter Container for all data used in this workflow.
      */
     run: function(step, dexter) {
-        var auth        = dexter.provider('instapaper').credentials() 
+        var auth        = dexter.provider('instapaper').credentials()
           , client      = Instapaper(auth.consumer_key, auth.consumer_secret, {apiUrl: apiUrl})
           , folder_ids  = step.input('folder_id')
           , limit       = step.input('limit').first()
@@ -43,6 +43,7 @@ module.exports = {
 
         client.setOAuthCredentials(auth.access_token, auth.access_token_secret);
 
+        var self = this;
         _.each(folder_ids,function(folder_id) {
             var deferred = q.defer();
             client.bookmarks.list({folder_id: folder_id, limit: limit || 25})
@@ -53,10 +54,11 @@ module.exports = {
                             id     : bookmark.bookmark_id
                             , url  : bookmark.url
                             , time : bookmark.time
+                            , title: bookmark.title
                         };
                    });
 
-                   Array.prototype.splice.apply(bookmarks, [bookmarks.length, 0].concat(_bookmarks)); 
+                   Array.prototype.splice.apply(bookmarks, [bookmarks.length, 0].concat(_bookmarks));
                    deferred.resolve();
                }).catch(function(err) {
                    deferred.reject(err);

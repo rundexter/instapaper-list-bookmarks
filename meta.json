@@ -16,6 +16,9 @@
         "id"    : "url",
         "title" : "URL"
     }, {
+        "id"    : "title",
+        "title" : "Title"
+    }, {
         "id"    : "time",
         "title" : "Timestamp"
     }],
